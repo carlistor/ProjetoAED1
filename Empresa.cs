@@ -1,7 +1,11 @@
 using System;
-using System.IO;
-using System.Text;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.IO;
+using System.Runtime.InteropServices;
 /*ID_empresa, NomeEmpresa, Endereco, telefone, SetorAtuacao*/
 class Empresa{
   private string ID_empresa;
@@ -15,7 +19,7 @@ class Empresa{
     ID_empresa = "000";
     NomeEmpresa = " ";
     telefone = "00000000000";
-    SetorAtuacao = " ";
+    SetorAtuacao = "Comercio";
   }
   public Empresa( string id, string nome, string tel, string setor){
     ID_empresa = id;
@@ -25,9 +29,10 @@ class Empresa{
     this.MeuEndereco = new Endereco();
     this.MeuEmpreendedor = new Empreendedor();
     //gravar aqruivo de texto com id da empresa e setor
-    FileStream arq = new FileStream("EmpresaCadastradas.txt" ,FileMode.Append, FileAccess.Write);
+    
+    /*FileStream arq = new FileStream("EmpresaCadastradas.txt" ,FileMode.Append, FileAccess.Write);
     StreamWriter sw = new StreamWriter(arq, Encoding.UTF8);
-    List<string> dados = new List<string>(){SetorAtuacao,"|",ID_empresa,"|"};
+    List<string> dados = new List<string>(){ID_empresa ,"|",SetorAtuacao,"|", NomeEmpresa,"|",telefone};
 
      foreach(var item in dados){
       sw.Write(item);
@@ -36,7 +41,38 @@ class Empresa{
     sw.WriteLine(" ");
 
     sw.Close();
-    arq.Close();
+    arq.Close();*/
+        //Ler arquivo 
+    FileStream meuArq = new FileStream("EmpresaCadastradas.txt", FileMode.Open, FileAccess.Read);
+    StreamReader reader = new StreamReader(meuArq, Encoding.UTF8);
+    List<string> ID_cadas = new List<string>();
+   
+    while(!reader.EndOfStream){
+        string linha = reader.ReadLine();        
+        string[] valores = linha.Split("|");
+        ID_cadas.Add(linha);
+      }
+      for (int i=0; i<ID_cadas.Count;i++){
+        if(ID_empresa != ID_cadas[i]){
+           //GRavar arquivo 
+          FileStream arq = new FileStream("EmpresaCadastradas.txt" ,FileMode.Append, FileAccess.Write);
+          StreamWriter sw = new StreamWriter(arq, Encoding.UTF8);
+          List<string> dados = new List<string>(){ID_empresa ,"|",SetorAtuacao,"|", NomeEmpresa,"|",telefone};
+
+          foreach(var item in dados){
+          sw.Write(item);     
+          }
+          sw.WriteLine(" ");
+          sw.Close();
+          arq.Close();
+
+        }else{
+          Console.WriteLine("Empresa ja Cadastrada");
+        }
+        
+      }
+      reader.Close();
+      meuArq.Close();
   }
   //endereço
   public Endereco getMeuEndereco(){
@@ -71,19 +107,47 @@ class Empresa{
   }
   
   public void CadastrarEmpreendedor(Empreendedor MeuEmpreendedor){
+      if (MeuEmpreendedor.getSetorAtuacao() == SetorAtuacao){
+        //Manipulador:
+        FileStream meuArq = new FileStream("Mei.txt", FileMode.Append, FileAccess.Write);        
+        //Escritor para o arquivo:
+        StreamWriter sw = new StreamWriter(meuArq, Encoding.UTF8);
+        string str = string.Empty;
+        
+        //Realiza a gravação da linha de texto dentro do arquivo:
+        List<string> dados = new List<string>(){MeuEmpreendedor.getId_Empreendedor(),"|",MeuEmpreendedor.getNome(),"|",MeuEmpreendedor.getMeuEndereco().getMunicipio(),"|",MeuEmpreendedor.getTelefone()};
 
-      //Manipulador:
-      FileStream meuArq = new FileStream("Mei.txt", FileMode.Append, FileAccess.Write);
-      //Escritor para o arquivo:
-      StreamWriter sw = new StreamWriter(meuArq, Encoding.UTF8);
-      string str = string.Empty;
-      str = MeuEmpreendedor.getTelefone();
-       //Realiza a gravação da linha de texto dentro do arquivo:
-      sw.WriteLine(str);
-      str = MeuEmpreendedor.getNome();
-      sw.WriteLine(str);
-      sw.Close();
-      meuArq.Close();
+          foreach(var item in dados){
+            sw.Write(item);
+            
+          }
+          sw.WriteLine("");
+        sw.Close();
+        meuArq.Close();
+      }else
+      {
+        Console.Write("{0} :Empreendedor Não e compativel ao setor de atuação" ,MeuEmpreendedor.getNome());
+      }      
     }
+    /*public void CadastrarRepresentante(Representante UmRepresentante){
+      //Manipulador:
+        FileStream meuArq = new FileStream("RepresentanteCadastrado.txt", FileMode.Append, FileAccess.Write);        
+        //Escritor para o arquivo:
+        StreamWriter sw = new StreamWriter(meuArq, Encoding.UTF8);
+        string str = string.Empty;
+        
+        //Realiza a gravação da linha de texto dentro do arquivo:
+        List<string> dados = new List<string>(){UmRepresentante.getId_representante(),"|",UmRepresentante.getNome(),"|",UmRepresentante.getMeuEndereco().getMunicipio(),"|",UmRepresentante.getTelefone()};
+
+          foreach(var item in dados){
+            sw.Write(item);
+            
+          }
+          sw.WriteLine("");
+        sw.Close();
+        meuArq.Close();
+      
+    }*/
+
 
 }
